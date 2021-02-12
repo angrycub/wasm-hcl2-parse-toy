@@ -50,10 +50,11 @@ func jsonWrapper() js.Func {
             }
             return result
         }
-        inputJSON := args[0].String()
-        fmt.Printf("input %s\n", inputJSON)
-        // pretty, err := prettyJson(inputJSON)
-        pretty, err := parseHCL(inputJSON)
+        inputHCL := args[0].String()
+        fmt.Printf("input %s\n", inputHCL)
+        pretty, err := parseHCL(inputHCL)
+        fmt.Printf("output %s\n", pretty)
+
         if err != nil {
             errStr := fmt.Sprintf("unable to parse HCL. Error %s occurred\n", err)
             result := map[string]interface{}{
@@ -61,7 +62,7 @@ func jsonWrapper() js.Func {
             }
             return result
         }
-        jsonOuputTextArea.Set("value", pretty)
+        jsonOuputTextArea.Set("textContent", pretty)
         return nil
     })
     return jsonfunc

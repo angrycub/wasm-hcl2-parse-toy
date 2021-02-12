@@ -1,27 +1,87 @@
-<html>  
-    <head>
-        <meta charset="utf-8"/>
-        <script src="wasm_exec.js"></script>
-        <script>
-            const go = new Go();
-            WebAssembly.instantiateStreaming(fetch("json.wasm"), go.importObject).then((result) => {
-                go.run(result.instance);
-            });
-        </script>
-    </head>
-    <body>
-         <textarea id="jsoninput" name="jsoninput" cols="80" rows="20"></textarea>
-         <input id="button" type="submit" name="button" value="pretty json" onclick="json(jsoninput.value)"/>
-         <textarea id="jsonoutput" name="jsonoutput" cols="80" rows="20"></textarea>
-    </body>
+<html>
+  <head>
+    <link href="prism.css" rel="stylesheet" />
+    <meta charset="utf-8"/>
+
+    <script src="wasm_exec.js"></script>
     <script>
-         var json = function(input) {
-                var result = formatJSON(input)
-                if (( result != null) && ('error' in result)) {
-                    console.log("Go return value", result)
-                    jsonoutput.value = ""
-                    alert(result.error)
-                }
-        }
+      const go = new Go();
+      WebAssembly.instantiateStreaming(fetch("json.wasm"), go.importObject).then((result) => {
+        go.run(result.instance);
+      });
     </script>
-</html>  
+    <style type="text/css">
+.container {
+  display: flex;
+  height: 100%;
+}
+
+.item {
+   /* Set the side elements to grow and stretch */
+  flex-grow: 1;
+  height: 100%;
+  overflow: scroll;
+  background-color: #2d2d2d;
+}
+
+.item-center { 
+  align-self: center;
+  justify-content: center
+  width: 100rem;
+}
+
+.item + .item-center { 
+  margin-left: 2%; 
+}
+.item-center + .item { 
+  margin-left: 2%; 
+}
+</style>
+
+  </head>
+<body>
+  <div class="container">
+<div class="item"><pre><code class="language-nomad line-numbers" contenteditable="true" id="input">job "example" {
+  datacenters = ["dc1"]
+  group "cache" {
+    network {
+      port "db" {
+        to = 6379
+      }
+    }
+    task "redis" {
+      driver = "docker"
+      config {
+        image = "redis:3.2"
+        ports = ["db"]
+      }
+      resources {
+        cpu    = 500
+        memory = 256
+      }
+    }
+  }
+}</code></pre></div>
+      <div class="item-center">
+        <input id="button" type="submit" name="button" value="To JSON" onclick="json(input.textContent)"/>
+      </div>
+      <div class="item">
+        <pre><code class="language-json line-numbers" id="jsonoutput" name="jsonoutput" >Click to convert to JSON</code></pre>
+      </div></div>
+    </body>
+
+    <script src="prism.js"></script>
+    <script>
+      var json = function(input) {
+        var result = formatJSON(input)
+        if (( result != null) && ('error' in result)) {
+          console.log("Go return value", result)
+          jsonoutput.value = ""
+          alert(result.error)
+          output = document.getElementByID(jsonoutput)
+        }
+        Prism.highlightAll()
+      }
+    </script>
+
+</html>
